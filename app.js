@@ -167,6 +167,50 @@ function analyzePassword(password) {
     
     pwdFeedback.textContent = feedback;
     pwdFeedback.style.borderLeftColor = color;
+
+    // Trigger server-side analysis
+    fetchServerPasswordAnalysis(password);
+}
+
+let pwdThrottleTimer;
+async function fetchServerPasswordAnalysis(password) {
+    if (pwdThrottleTimer) clearTimeout(pwdThrottleTimer);
+    
+    // Check if server insights element exists, otherwise create it
+    let serverInsights = document.getElementById('pwdServerInsights');
+    if (!serverInsights) {
+        serverInsights = document.createElement('div');
+        serverInsights.id = 'pwdServerInsights';
+        serverInsights.className = 'feedback-box mt-4';
+        serverInsights.style.borderLeftColor = 'var(--accent-blue)';
+        serverInsights.innerHTML = '<i data-lucide="loader" class="spin"></i> Consulting database...';
+        pwdFeedback.parentNode.insertBefore(serverInsights, pwdFeedback.nextSibling);
+        lucide.createIcons();
+    } else {
+        serverInsights.innerHTML = '<i data-lucide="loader" class="spin"></i> Consulting database...';
+        serverInsights.classList.remove('hidden');
+        lucide.createIcons();
+    }
+    
+    pwdThrottleTimer = setTimeout(async () => {
+        try {
+            const res = await fetch('https://web-production-c658.up.railway.app/api/check-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+            const data = await res.json();
+            
+            if (data.score !== undefined) {
+                let srvStrength = data.strength || (data.score > 2 ? 'Strong' : data.score === 2 ? 'Medium' : 'Weak');
+                serverInsights.innerHTML = `<strong>Server Analysis:</strong> zxcvbn Score: ${data.score}/4 (${srvStrength}). ${data.feedback ? data.feedback.warning || '' : ''}`;
+            } else {
+                serverInsights.innerHTML = `<strong>Server Analysis:</strong> Strength metrics retrieved.`;
+            }
+        } catch (e) {
+            serverInsights.innerHTML = `<strong>Server Analysis:</strong> <span class="text-danger">Failed to connect to backend engine.</span>`;
+        }
+    }, 800);
 }
 
 function updateReqItem(el, isMet) {
@@ -192,6 +236,9 @@ function resetPasswordAnalyzer() {
     pwdStrengthText.style.color = 'var(--text-main)';
     pwdFeedback.textContent = 'Please enter a password to begin analysis.';
     pwdFeedback.style.borderLeftColor = 'var(--text-muted)';
+    
+    const serverInsights = document.getElementById('pwdServerInsights');
+    if (serverInsights) serverInsights.classList.add('hidden');
     
     [reqLength, reqUpper, reqLower, reqNumber, reqSpecial].forEach(el => updateReqItem(el, false));
 }
@@ -319,9 +366,15 @@ const urlResultBox = document.getElementById('urlResultBox');
 const urlRiskBadge = document.getElementById('urlRiskBadge');
 const urlFindings = document.getElementById('urlFindings');
 
-btnAnalyzeUrl.addEventListener('click', () => {
+btnAnalyzeUrl.addEventListener('click', async () => {
     const urlString = urlInput.value.trim();
     if (!urlString) return;
+
+    // Loading State
+    const originalBtnHTML = btnAnalyzeUrl.innerHTML;
+    btnAnalyzeUrl.innerHTML = '<i data-lucide="loader" class="spin"></i> Analyzing...';
+    btnAnalyzeUrl.disabled = true;
+    lucide.createIcons();
 
     let url;
     try {
@@ -332,6 +385,9 @@ btnAnalyzeUrl.addEventListener('click', () => {
             icon: 'alert-triangle',
             text: 'Invalid URL format. Malformed URLs are often a sign of malicious intent or hidden payloads.'
         }]);
+        btnAnalyzeUrl.innerHTML = originalBtnHTML;
+        btnAnalyzeUrl.disabled = false;
+        lucide.createIcons();
         return;
     }
 
@@ -375,9 +431,42 @@ btnAnalyzeUrl.addEventListener('click', () => {
         riskScore += 40;
     }
 
+    // 3. Server API Call (VirusTotal)
+    try {
+        const res = await fetch('https://web-production-c658.up.railway.app/api/check-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: urlString })
+        });
+        
+        if (res.ok) {
+            const data = await res.json();
+            
+            // Format VT data
+            if (data.malicious > 0 || data.suspicious > 0) {
+                findings.unshift({ 
+                    icon: 'shield-alert', 
+                    text: `<strong>VirusTotal Detection:</strong> Flagged by ${data.malicious} engine(s) as malicious and ${data.suspicious} as suspicious.` 
+                });
+                riskScore += (data.malicious * 50) + (data.suspicious * 20); // Spike score based on VT
+            } else if (data.harmless > 0) {
+                findings.push({ 
+                    icon: 'shield-check', 
+                    text: `<strong>VirusTotal Analysis:</strong> ${data.harmless} security vendors classified this as harmless.` 
+                });
+            } else if (data.error) {
+                 findings.push({ icon: 'server-crash', text: `Server warning: ${data.error}` });
+            }
+        } else {
+            findings.push({ icon: 'server-crash', text: 'Failed to retrieve deep analysis from backend API.' });
+        }
+    } catch(err) {
+        findings.push({ icon: 'wifi-off', text: 'Backend API unreachable. Falling back to local static analysis only.' });
+    }
+
     // Determine overall risk
     if (riskScore === 0) {
-        findings.push({ icon: 'shield-check', text: 'No immediate static phishing indicators detected.' });
+        findings.push({ icon: 'shield-check', text: 'No static or external phishing indicators detected.' });
     } else if (riskScore < 50) {
         riskLevel = 'Suspicious';
         riskClass = 'suspicious';
@@ -387,7 +476,14 @@ btnAnalyzeUrl.addEventListener('click', () => {
     }
 
     showUrlResult(riskLevel, riskClass, findings);
+    
+    // Restore button
+    btnAnalyzeUrl.innerHTML = originalBtnHTML;
+    btnAnalyzeUrl.disabled = false;
+    lucide.createIcons();
 });
+
+    // Old code was orphaned down here; removed.
 
 function showUrlResult(level, className, findings) {
     urlResultBox.classList.remove('hidden');
@@ -456,65 +552,89 @@ function handleFileSelect(e) {
     if (e.target.files.length > 0) analyzeFile(e.target.files[0]);
 }
 
-function analyzeFile(file) {
-    // 1. Display Metadata
+async function analyzeFile(file) {
+    // Show Loading state on UI
     fName.textContent = file.name;
     fSize.textContent = formatBytes(file.size);
     fType.textContent = file.type || 'Unknown / Binary';
     fDate.textContent = file.lastModifiedDate ? file.lastModifiedDate.toLocaleString() : new Date(file.lastModified).toLocaleString();
 
-    // 2. Risk Assessment
+    // Reset Badge
+    fileRiskBadge.className = `risk-indicator`;
+    fileRiskBadge.innerHTML = `<i data-lucide="loader" class="spin"></i> Uploading to VirusTotal...`;
+    fileFindings.innerHTML = '';
+    lucide.createIcons();
+    fileResultBox.classList.remove('hidden');
+
     let riskScore = 0;
-    let riskLevel = 'Safe';
-    let riskClass = 'safe';
     const findings = [];
-    
     const fileName = file.name.toLowerCase();
     
-    // Check for executables and scripts
+    // 1. Local Static Risk Assessment
     const highRiskExts = ['.exe', '.bat', '.cmd', '.msi', '.vbs', '.ps1', '.js', '.wsf', '.scr', '.pif'];
-    const hasHighRiskExt = highRiskExts.some(ext => fileName.endsWith(ext));
-    if (hasHighRiskExt) {
-        findings.push({ icon: 'alert-triangle', text: `Contains a highly dangerous file extension. Executable files can run arbitrary code on your machine.` });
+    if (highRiskExts.some(ext => fileName.endsWith(ext))) {
+        findings.push({ icon: 'alert-triangle', text: `Contains a highly dangerous file extension. Executable files can run arbitrary code.` });
         riskScore += 80;
     }
 
-    // Check for macro-enabled office documents
     const macroExts = ['.docm', '.xlsm', '.pptm', '.dotm'];
-    const hasMacroExt = macroExts.some(ext => fileName.endsWith(ext));
-    if (hasMacroExt) {
-        findings.push({ icon: 'alert-circle', text: `This is a macro-enabled Office document. Macros are frequently used by attackers to download malware payloads.` });
+    if (macroExts.some(ext => fileName.endsWith(ext))) {
+        findings.push({ icon: 'alert-circle', text: `This is a macro-enabled Office document. Macros are frequently used by attackers.` });
         riskScore += 60;
     }
     
-    // Check for archives/disk images often used for smuggling
-    const archiveExts = ['.zip', '.rar', '.7z', '.iso', '.img', '.cab'];
-    const hasArchiveExt = archiveExts.some(ext => fileName.endsWith(ext));
-    if (hasArchiveExt) {
-        findings.push({ icon: 'package-open', text: `Archive or disk image file. These are often used to smuggle malicious files past email filters. Extract with caution.` });
-        riskScore += 30;
-    }
-    
-    // Check for Double Extensions (e.g., invoice.pdf.exe)
     const nameParts = fileName.split('.');
     if (nameParts.length > 2) {
-        // e.g., parts = ["invoice", "pdf", "exe"]
-        const secondToLast = nameParts[nameParts.length - 2];
-        const last = nameParts[nameParts.length - 1];
-        
-        // Common safe multi-extensions (tar.gz, min.js, etc.)
+        const combo = `${nameParts[nameParts.length - 2]}.${nameParts[nameParts.length - 1]}`;
         const safeDoubles = ['tar.gz', 'min.js', 'min.css', 'd.ts'];
-        const combo = `${secondToLast}.${last}`;
-        
         if (!safeDoubles.includes(combo)) {
-            findings.push({ icon: 'eye-off', text: `Double extension detected (.${secondToLast}.${last}). Attackers use this to trick Windows users into thinking an executable is a document.`});
+            findings.push({ icon: 'eye-off', text: `Double extension detected (.${combo}). Attackers use this to trick Windows users.`});
             riskScore += 50;
         }
     }
     
+    // 2. Server API Scan
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch('https://web-production-c658.up.railway.app/api/scan-file', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            if (data.malicious > 0 || data.suspicious > 0) {
+                findings.unshift({
+                    icon: 'shield-alert',
+                    text: `<strong>VirusTotal Deep Scan:</strong> Flagged by ${data.malicious} engine(s) as malicious and ${data.suspicious} as suspicious.`
+                });
+                riskScore += (data.malicious * 50);
+            } else if (data.harmless > 0 || data.undetected > 0) {
+                 findings.push({
+                    icon: 'shield-check',
+                    text: `<strong>VirusTotal Deep Scan:</strong> Clean. ${data.harmless + data.undetected} engines detected no threats.`
+                });
+            } else if (data.error) {
+                findings.push({ icon: 'server-crash', text: `Server analysis warning: ${data.error}` });
+            }
+        } else {
+             findings.push({ icon: 'server-crash', text: 'Failed to retrieve deep analysis from backend API.' });
+        }
+
+    } catch(err) {
+        findings.push({ icon: 'wifi-off', text: 'Backend API unreachable. Analysis relies purely on local static checks.' });
+    }
+
     // Determine overall risk
+    let riskLevel = 'Safe';
+    let riskClass = 'safe';
+
     if (riskScore === 0) {
-        findings.push({ icon: 'shield-check', text: 'File appears to be a standard document or media type with no obvious static threat indicators.' });
+        if (findings.length === 0) {
+            findings.push({ icon: 'shield-check', text: 'File appears to be a standard document or media type with no obvious static threat indicators.' });
+        }
     } else if (riskScore < 50) {
         riskLevel = 'Suspicious';
         riskClass = 'suspicious';
@@ -524,8 +644,6 @@ function analyzeFile(file) {
     }
 
     showFileResult(riskLevel, riskClass, findings);
-    
-    fileResultBox.classList.remove('hidden');
 }
 
 function showFileResult(level, className, findings) {
