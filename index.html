@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackICE Cybersecurity Toolkit</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Load Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="bg-elements">
+        <div class="glow-orb primary"></div>
+        <div class="glow-orb secondary"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <nav class="navbar glass">
+        <div class="nav-brand" onclick="navigateTo('home')">
+            <i data-lucide="shield-half" class="brand-icon"></i>
+            <span class="brand-text">Black<span class="neon-text">ICE</span></span>
+        </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i data-lucide="menu"></i>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="#" class="nav-item active" data-view="home" onclick="navigateTo('home')">Home</a>
+            <a href="#" class="nav-item" data-view="dashboard" onclick="navigateTo('dashboard')">Tools</a>
+            <a href="#" class="nav-item" data-view="password" onclick="navigateTo('password')">Password Analyzer</a>
+            <a href="#" class="nav-item" data-view="hash" onclick="navigateTo('hash')">Hash Generator</a>
+            <a href="#" class="nav-item" data-view="phishing" onclick="navigateTo('phishing')">Phishing Checker</a>
+            <a href="#" class="nav-item" data-view="file" onclick="navigateTo('file')">File Analyzer</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- View: Home -->
+        <section id="view-home" class="view active fade-in">
+            <div class="hero">
+                <div class="hero-badge">Stateless & Secure</div>
+                <h1 class="hero-title">Black<span class="neon-text">ICE</span> Cybersecurity Toolkit</h1>
+                <p class="hero-subtitle">A practical cybersecurity learning platform</p>
+                <p class="hero-desc">Experiment with real cybersecurity tools directly in your browser. All analysis is performed locally. No database, no registration, no traces left behind.</p>
+                <button class="btn btn-primary btn-large" onclick="navigateTo('dashboard')">
+                    <i data-lucide="zap"></i> Start Exploring Tools
+                </button>
+            </div>
+
+            <div class="features-grid">
+                <div class="card glass interactive" onclick="navigateTo('password')">
+                    <div class="card-icon-wrapper">
+                        <i data-lucide="key-round" class="card-icon"></i>
+                    </div>
+                    <h3>Password Security Analyzer</h3>
+                    <p>Test your password strength, complexity, and resistance to brute force attacks in real-time.</p>
+                </div>
+                
+                <div class="card glass interactive" onclick="navigateTo('hash')">
+                    <div class="card-icon-wrapper">
+                        <i data-lucide="hash" class="card-icon"></i>
+                    </div>
+                    <h3>Hash & Cipher Generator</h3>
+                    <p>Generate one-way cryptographic SHA-256 hashes or encrypt text using Caesar Cipher shifts securely.</p>
+                </div>
+                
+                <div class="card glass interactive" onclick="navigateTo('phishing')">
+                    <div class="card-icon-wrapper">
+                        <i data-lucide="fish-symbol" class="card-icon"></i>
+                    </div>
+                    <h3>Phishing URL Checker</h3>
+                    <p>Analyze suspicious links for common phishing patterns, domain spoofing, and risk indicators.</p>
+                </div>
+                
+                <div class="card glass interactive" onclick="navigateTo('file')">
+                    <div class="card-icon-wrapper">
+                        <i data-lucide="file-search" class="card-icon"></i>
+                    </div>
+                    <h3>File Analyzer</h3>
+                    <p>Inspect file metadata and preview raw hexadecimal bytes without uploading to any server.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: Dashboard -->
+        <section id="view-dashboard" class="view">
+            <div class="section-header">
+                <h2>Tools Dashboard</h2>
+                <p>Select a tool to begin local analysis.</p>
+            </div>
+            <div class="tools-grid">
+                <!-- Filled dynamically or repeating the grid from home -->
+                <div class="card glass dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon-wrapper">
+                            <i data-lucide="key-round" class="card-icon"></i>
+                        </div>
+                        <h3>Password Analyzer</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Evaluate credential resilience against cracking techniques.</p>
+                        <button class="btn btn-primary" onclick="navigateTo('password')">Open Tool <i data-lucide="arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="card glass dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon-wrapper">
+                            <i data-lucide="hash" class="card-icon"></i>
+                        </div>
+                        <h3>Hash & Cipher</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Produce SHA-256 digests or Caesar cipher text.</p>
+                        <button class="btn btn-primary" onclick="navigateTo('hash')">Open Tool <i data-lucide="arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="card glass dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon-wrapper">
+                            <i data-lucide="fish-symbol" class="card-icon"></i>
+                        </div>
+                        <h3>Phishing Checker</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Heuristic evaluation of URLs for deceptive characteristics.</p>
+                        <button class="btn btn-primary" onclick="navigateTo('phishing')">Open Tool <i data-lucide="arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="card glass dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon-wrapper">
+                            <i data-lucide="file-search" class="card-icon"></i>
+                        </div>
+                        <h3>File Analyzer</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Extract metadata and preview hex signatures client-side.</p>
+                        <button class="btn btn-primary" onclick="navigateTo('file')">Open Tool <i data-lucide="arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: Password Analyzer -->
+        <section id="view-password" class="view">
+            <div class="tool-layout">
+                <div class="tool-main card glass">
+                    <div class="tool-header">
+                        <i data-lucide="key-round"></i>
+                        <h2>Password Security Analyzer</h2>
+                    </div>
+                    <div class="tool-content">
+                        <div class="input-group">
+                            <label for="pwdInput">Enter Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="pwdInput" placeholder="Type a password to analyze..." class="cyber-input">
+                                <button id="pwdToggle" class="icon-btn"><i data-lucide="eye"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="strength-meter-container">
+                            <div class="strength-labels">
+                                <span>Strength: <strong id="pwdStrengthText">None</strong></span>
+                                <span id="pwdScore">0/100</span>
+                            </div>
+                            <div class="meter-bg">
+                                <div class="meter-fill" id="pwdMeter"></div>
+                            </div>
+                        </div>
+
+                        <div id="pwdFeedback" class="feedback-box">
+                            Please enter a password to begin analysis.
+                        </div>
+
+                        <div class="req-grid">
+                            <div class="req-item" id="req-length"><i data-lucide="circle"></i> 8+ Characters</div>
+                            <div class="req-item" id="req-upper"><i data-lucide="circle"></i> Uppercase</div>
+                            <div class="req-item" id="req-lower"><i data-lucide="circle"></i> Lowercase</div>
+                            <div class="req-item" id="req-number"><i data-lucide="circle"></i> Number</div>
+                            <div class="req-item" id="req-special"><i data-lucide="circle"></i> Special Char</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tool-sidebar card glass">
+                    <h3><i data-lucide="book-open"></i> Educational Note</h3>
+                    <p><strong>Password Security Principles</strong></p>
+                    <p>A strong password resists <em>brute-force</em> attacks (guessing all combinations) and <em>dictionary</em> attacks (trying common words).</p>
+                    <ul>
+                        <li><strong>Length:</strong> The most crucial factor. Each added character exponentially increases time to crack.</li>
+                        <li><strong>Complexity:</strong> Mixing character types prevents attackers from narrowing down the search space.</li>
+                        <li><strong>Unpredictability:</strong> Avoid common substitutions (e.g., 'P@ssw0rd') which are already in attacker dictionaries.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: Hash & Cipher Generator -->
+        <section id="view-hash" class="view">
+            <div class="tool-layout">
+                <div class="tool-main card glass">
+                    <div class="tool-header">
+                        <i data-lucide="hash"></i>
+                        <h2>Hash & Cipher Generator</h2>
+                    </div>
+                    <div class="tool-content">
+                        <div class="input-group">
+                            <label for="hashInput">Text Payload</label>
+                            <textarea id="hashInput" rows="3" placeholder="Enter text here to process..." class="cyber-input"></textarea>
+                        </div>
+                        
+                        <!-- Actions Row -->
+                        <div class="actions" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+                            <button id="btnGenerateHash" class="btn btn-primary"><i data-lucide="cpu"></i> Generate SHA-256</button>
+                            
+                            <div style="width: 2px; height: 38px; background: rgba(255,255,255,0.1); margin: 0 0.5rem;"></div>
+                            
+                            <div class="input-wrapper" style="width: 120px;">
+                                <i data-lucide="fast-forward" class="input-icon"></i>
+                                <input type="number" id="cipherShiftAmount" value="3" class="cyber-input with-icon" title="Shift amount">
+                            </div>
+                            <button id="btnGenerateCipher" class="btn btn-outline"><i data-lucide="lock"></i> Caesar Shift</button>
+                        </div>
+
+                        <!-- Hash Result -->
+                        <div class="result-box mt-4 hidden" id="hashResultBox">
+                            <label>SHA-256 Output</label>
+                            <div class="output-wrapper">
+                                <code id="hashOutput" class="cyber-code"></code>
+                                <button id="btnCopyHash" class="icon-btn" title="Copy to clipboard"><i data-lucide="copy"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Cipher Result -->
+                        <div class="result-box mt-4 hidden" id="cipherResultBox">
+                            <label>Caesar Cipher Output (Shifted)</label>
+                            <div class="output-wrapper">
+                                <code id="cipherOutput" class="cyber-code"></code>
+                                <button id="btnCopyCipher" class="icon-btn" title="Copy to clipboard"><i data-lucide="copy"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-sidebar card glass">
+                    <h3><i data-lucide="book-open"></i> Educational Note</h3>
+                    <p><strong>Hashing vs Encryption</strong></p>
+                    <p><em>SHA-256</em> is a one-way hashing function. It produces a fixed 64-character signature resistant to reversal. Changing one letter completely changes the hash.</p>
+                    <p class="mt-2"><em>Caesar Cipher</em> is a classic, two-way encryption technique. It shifts each letter of the plaintext by a fixed number of positions down the alphabet (e.g., A becomes D if the shift is 3).</p>
+                    <ul>
+                        <li><strong class="text-danger">Warning:</strong> Caesar Cipher provides <em>zero</em> real-world security today as it is trivially broken by frequency analysis or brute force (checking all 25 shifts).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: Phishing Checker -->
+        <section id="view-phishing" class="view">
+             <div class="tool-layout">
+                <div class="tool-main card glass">
+                    <div class="tool-header">
+                        <i data-lucide="fish-symbol"></i>
+                        <h2>Phishing URL Checker</h2>
+                    </div>
+                    <div class="tool-content">
+                        <div class="input-group">
+                            <label for="urlInput">Suspicious URL Target</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="link" class="input-icon"></i>
+                                <input type="url" id="urlInput" placeholder="https://example.com/login" class="cyber-input with-icon">
+                            </div>
+                        </div>
+                        
+                        <div class="actions">
+                            <button id="btnAnalyzeUrl" class="btn btn-primary"><i data-lucide="radar"></i> Analyze URL</button>
+                        </div>
+
+                        <div class="result-box mt-4 hidden" id="urlResultBox">
+                            <div class="risk-indicator" id="urlRiskBadge">
+                                <!-- Safe / Suspicious / High Risk -->
+                            </div>
+                            
+                            <ul class="finding-list" id="urlFindings">
+                                <!-- Findings injected here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-sidebar card glass">
+                    <h3><i data-lucide="book-open"></i> Educational Note</h3>
+                    <p><strong>Phishing Detection</strong></p>
+                    <p>Phishing is a social engineering attack where bad actors impersonate legitimate entities to steal credentials or data.</p>
+                    <p>Attackers often use deceptive URLs. Common red flags include:</p>
+                    <ul>
+                        <li><strong>IP Addresses:</strong> Real companies use domain names. URLs like `http://192.168.1.1/login` are highly suspicious.</li>
+                        <li><strong>Typosquatting:</strong> Subtle misspellings (e.g., `google.com` vs `go0gle.com`).</li>
+                        <li><strong>Excessive Subdomains:</strong> `paypal.com-secure.login.verify.domain.com` attempts to hide the real domain (`domain.com`).</li>
+                        <li><strong>Tricky Keywords:</strong> Urgent words like "verify", "secure", "update", or "login" embedded in strange paths.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: File Analyzer -->
+        <section id="view-file" class="view">
+            <div class="tool-layout">
+                <div class="tool-main card glass">
+                    <div class="tool-header">
+                        <i data-lucide="file-search"></i>
+                        <h2>File Analyzer</h2>
+                    </div>
+                    <div class="tool-content">
+                        
+                        <div class="file-drop-zone" id="fileDropZone">
+                            <input type="file" id="fileInput" class="visually-hidden">
+                            <i data-lucide="upload-cloud" class="drop-icon"></i>
+                            <p>Drag and drop a file here, or click to browse</p>
+                            <span class="muted-text">Max size: No limit (Processed locally in RAM)</span>
+                            <button class="btn btn-outline mt-2" onclick="document.getElementById('fileInput').click()">Select File</button>
+                        </div>
+
+                        <div class="result-box mt-4 hidden" id="fileResultBox">
+                            <h3 class="mb-2 border-bottom pb-1">File Metadata</h3>
+                            <div class="metadata-grid">
+                                <div class="meta-item">
+                                    <span class="meta-label">Name</span>
+                                    <span class="meta-value" id="fileMetaName">...</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Size</span>
+                                    <span class="meta-value" id="fileMetaSize">...</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Type (MIME)</span>
+                                    <span class="meta-value" id="fileMetaType">...</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Last Modified</span>
+                                    <span class="meta-value" id="fileMetaDate">...</span>
+                                </div>
+                            </div>
+                            
+                            <h3 class="mt-4 mb-2 border-bottom pb-1">Risk Assessment</h3>
+                            <div class="risk-indicator" id="fileRiskBadge">
+                                <!-- Safe / Suspicious / High Risk -->
+                            </div>
+                            
+                            <ul class="finding-list" id="fileFindings">
+                                <!-- Findings injected here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-sidebar card glass">
+                    <h3><i data-lucide="book-open"></i> Educational Note</h3>
+                    <p><strong>Static File Analysis</strong></p>
+                    <p>File extensions alone don't determine if a file is safe. Attackers use multiple techniques to disguise malware:</p>
+                    <ul>
+                        <li><strong>Executables:</strong> Files like `.exe`, `.bat`, `.cmd`, `.ps1`, or `.vbs` are inherently risky as they can execute arbitrary code.</li>
+                        <li><strong>Double Extensions:</strong> Attackers often use names like `invoice.pdf.exe`. Windows might hide the `.exe`, tricking users into thinking it's a PDF.</li>
+                        <li><strong>Office Macros:</strong> Documents like `.docm` or `.xlsm` contain embedded scripts that can download malware.</li>
+                        <li><strong>Archives:</strong> `.zip`, `.rar`, or `.iso` files are frequently used to smuggle payloads past email filters.</li>
+                    </ul>
+                    <p class="mt-2 text-primary text-sm"><i data-lucide="shield-check" style="width: 14px; height: 14px; display:inline-block; vertical-align:middle;"></i> Privacy Guarantee: Your files are read entirely within your browser's memory and are never transmitted to any server.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
