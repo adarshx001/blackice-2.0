@@ -47,8 +47,13 @@ window.addEventListener('popstate', (e) => {
     if (e.state && e.state.viewId) {
         navigateTo(e.state.viewId, false); // false = don't push history again
     } else {
-        // Fallback to home if no state
-        navigateTo('home', false);
+        // Fallback for file:// protocol direct hash changes
+        let hash = window.location.hash.substring(1);
+        if (hash && document.getElementById(`view-${hash}`)) {
+            navigateTo(hash, false);
+        } else {
+            navigateTo('home', false);
+        }
     }
 });
 
