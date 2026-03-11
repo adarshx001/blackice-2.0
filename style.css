@@ -145,7 +145,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 2rem;
+    padding: 0 1rem;
     z-index: 100;
     border-radius: 0;
     border-left: none;
@@ -226,7 +226,7 @@ body {
 .container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 2rem 1rem;
     min-height: calc(100vh - 70px);
 }
 
@@ -536,10 +536,12 @@ body {
     width: 32px;
     height: 32px;
     color: var(--accent-neon);
+    flex-shrink: 0;
 }
 
 .tool-header h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    word-break: break-word;
 }
 
 .tool-sidebar h3 {
@@ -604,9 +606,9 @@ body {
 }
 
 .req-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
 }
 
 .req-item {
@@ -823,8 +825,13 @@ textarea.cyber-input {
 
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.25rem;
     }
+    
+    .hero-subtitle {
+        font-size: 1.25rem;
+    }
+
     .tools-grid {
         grid-template-columns: 1fr;
     }
@@ -832,6 +839,7 @@ textarea.cyber-input {
     .nav-links {
         display: none;
         flex-direction: column;
+        align-items: flex-start;
         position: absolute;
         top: 70px;
         left: 0;
@@ -842,6 +850,19 @@ textarea.cyber-input {
         border-bottom: 1px solid var(--border-light);
     }
     
+    .nav-item {
+        width: 100%;
+        padding: 0.75rem 1rem;
+    }
+    
+    .nav-item.active::after {
+        left: 0;
+        bottom: 0px;
+        width: 3px;
+        height: 100%;
+        border-radius: 0 3px 3px 0;
+    }
+    
     .nav-links.show {
         display: flex;
     }
@@ -849,16 +870,52 @@ textarea.cyber-input {
     .mobile-menu-btn {
         display: block;
     }
+    
+    /* Wrap buttons stackingly if they get too squeezed */
+    .actions {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+    
+    .actions > div {
+        display: none; /* Hide the vertical separator on mobile */
+    }
+    
+    .actions .input-wrapper, .actions .btn {
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 1rem 0.5rem;
+    }
+    
+    .card {
+        padding: 1.25rem;
+    }
+    
     .features-grid {
         grid-template-columns: 1fr;
     }
     .hex-viewer {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
+        padding: 0.5rem;
+    }
+    .hex-ascii {
+        display: none; /* Hide ASCII preview on very small phones */
     }
     .hero {
-        padding: 2rem 0;
+        padding: 1rem 0;
+    }
+    .metadata-grid {
+        grid-template-columns: 1fr;
+    }
+    .file-drop-zone {
+        padding: 2rem 1rem;
+    }
+    .tool-header h2 {
+        font-size: 1.25rem;
     }
 }
