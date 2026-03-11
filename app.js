@@ -33,7 +33,12 @@ function navigateTo(viewId, pushToHistory = true) {
     
     // Update Browser History (for mobile back button support)
     if (pushToHistory) {
-        history.pushState({ viewId }, document.title, `#${viewId}`);
+        try {
+            history.pushState({ viewId }, document.title, `#${viewId}`);
+        } catch(e) {
+            // Ignore SecurityError on file:// protocol
+            window.location.hash = viewId;
+        }
     }
 }
 
@@ -56,7 +61,11 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     
     // Replace initial state
-    history.replaceState({ viewId: hash }, document.title, `#${hash}`);
+    try {
+        history.replaceState({ viewId: hash }, document.title, `#${hash}`);
+    } catch(e) {
+        // Ignore SecurityError on file:// protocol
+    }
     navigateTo(hash, false);
 });
 
