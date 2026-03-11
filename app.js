@@ -2,7 +2,7 @@
 // Routing & Navigation
 // ==========================================
 
-function navigateTo(viewId) {
+function navigateTo(viewId, pushToHistory = true) {
     // Hide all views
     document.querySelectorAll('.view').forEach(view => {
         view.classList.remove('active');
@@ -30,7 +30,35 @@ function navigateTo(viewId) {
     if (navLinks.classList.contains('show')) {
         navLinks.classList.remove('show');
     }
+    
+    // Update Browser History (for mobile back button support)
+    if (pushToHistory) {
+        history.pushState({ viewId }, document.title, `#${viewId}`);
+    }
 }
+
+// Handle Browser Back/Forward buttons
+window.addEventListener('popstate', (e) => {
+    if (e.state && e.state.viewId) {
+        navigateTo(e.state.viewId, false); // false = don't push history again
+    } else {
+        // Fallback to home if no state
+        navigateTo('home', false);
+    }
+});
+
+// Initialize on load
+window.addEventListener('DOMContentLoaded', () => {
+    // Check if URL has a hash initially
+    let hash = window.location.hash.substring(1);
+    if (!hash || !document.getElementById(`view-${hash}`)) {
+        hash = 'home';
+    }
+    
+    // Replace initial state
+    history.replaceState({ viewId: hash }, document.title, `#${hash}`);
+    navigateTo(hash, false);
+});
 
 // Mobile Menu Toggle
 document.getElementById('mobileMenuBtn').addEventListener('click', () => {
