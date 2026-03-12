@@ -369,6 +369,71 @@ btnCopyCipher.addEventListener('click', () => {
     });
 });
 
+// ==========================================
+// Caesar Cipher Decoder Logic
+// ==========================================
+
+const btnDecodeCipher = document.getElementById('btnDecodeCipher');
+const decodeShiftAmount = document.getElementById('decodeShiftAmount');
+const decodeInput = document.getElementById('decodeInput');
+const decodeResultBox = document.getElementById('decodeResultBox');
+const decodeOutput = document.getElementById('decodeOutput');
+const btnCopyDecode = document.getElementById('btnCopyDecode');
+
+btnDecodeCipher.addEventListener('click', () => {
+    const text = decodeInput.value;
+    if (!text) return;
+
+    let shift = parseInt(decodeShiftAmount.value, 10);
+    if (isNaN(shift)) shift = 0;
+    
+    // Reverse shift
+    shift = -(shift % 26);
+    if (shift < 0) shift += 26;
+    
+    let result = '';
+    
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        
+        // Uppercase
+        if (char.match(/[A-Z]/)) {
+            const code = text.charCodeAt(i);
+            result += String.fromCharCode(((code - 65 + shift) % 26) + 65);
+        }
+        // Lowercase
+        else if (char.match(/[a-z]/)) {
+            const code = text.charCodeAt(i);
+            result += String.fromCharCode(((code - 97 + shift) % 26) + 97);
+        }
+        // Non-alphabetic (keep as is)
+        else {
+            result += char;
+        }
+    }
+    
+    decodeOutput.textContent = result;
+    decodeResultBox.classList.remove('hidden');
+    
+    decodeResultBox.style.animation = 'none';
+    decodeResultBox.offsetHeight; 
+    decodeResultBox.style.animation = 'fadeIn 0.4s ease forwards';
+});
+
+btnCopyDecode.addEventListener('click', () => {
+    const decodedText = decodeOutput.textContent;
+    if (!decodedText) return;
+    
+    navigator.clipboard.writeText(decodedText).then(() => {
+        btnCopyDecode.innerHTML = '<i data-lucide="check"></i>';
+        lucide.createIcons();
+        setTimeout(() => {
+            btnCopyDecode.innerHTML = '<i data-lucide="copy"></i>';
+            lucide.createIcons();
+        }, 2000);
+    });
+});
+
 
 // ==========================================
 // Tool 3: Phishing URL Checker

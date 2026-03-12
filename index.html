@@ -246,6 +246,33 @@
                                 <button id="btnCopyCipher" class="icon-btn" title="Copy to clipboard"><i data-lucide="copy"></i></button>
                             </div>
                         </div>
+
+                        <!-- Caesar Cipher Decoder -->
+                        <div class="mt-4 pt-4 border-top">
+                            <h3 class="mb-3" style="font-size: 1.1rem; font-weight: 500;">Caesar Cipher Decoder</h3>
+                            
+                            <div class="input-group">
+                                <label for="decodeInput">Encoded Text</label>
+                                <textarea id="decodeInput" rows="3" placeholder="Paste encoded text here to decode..." class="cyber-input"></textarea>
+                            </div>
+                            
+                            <div class="actions" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+                                <div class="input-wrapper" style="width: 120px;">
+                                    <i data-lucide="rewind" class="input-icon"></i>
+                                    <input type="number" id="decodeShiftAmount" value="3" class="cyber-input with-icon" title="Shift amount">
+                                </div>
+                                <button id="btnDecodeCipher" class="btn btn-outline"><i data-lucide="unlock"></i> Decode</button>
+                            </div>
+
+                            <!-- Decode Result -->
+                            <div class="result-box mt-4 hidden" id="decodeResultBox">
+                                <label>Decoded Output</label>
+                                <div class="output-wrapper">
+                                    <code id="decodeOutput" class="cyber-code"></code>
+                                    <button id="btnCopyDecode" class="icon-btn" title="Copy to clipboard"><i data-lucide="copy"></i></button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
