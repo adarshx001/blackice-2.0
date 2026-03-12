@@ -186,6 +186,7 @@ function analyzePassword(password) {
     fetchServerPasswordAnalysis(password);
 }
 
+
 let pwdThrottleTimer;
 async function fetchServerPasswordAnalysis(password) {
     if (pwdThrottleTimer) clearTimeout(pwdThrottleTimer);
