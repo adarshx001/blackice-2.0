@@ -3,51 +3,42 @@
 // ==========================================
 
 function navigateTo(viewId, pushToHistory = true) {
-    // Hide all views
     document.querySelectorAll('.view').forEach(view => {
         view.classList.remove('active');
     });
 
-    // Remove active class from nav items
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
 
-    // Show target view
     const targetView = document.getElementById(`view-${viewId}`);
     if (targetView) {
         targetView.classList.add('active');
     }
 
-    // Set active link (handling both desktop and mobile links if they share classes)
     const targetLinks = document.querySelectorAll(`.nav-item[data-view="${viewId}"]`);
     targetLinks.forEach(link => {
         link.classList.add('active');
     });
     
-    // Close mobile menu if open
     const navLinks = document.getElementById('navLinks');
     if (navLinks.classList.contains('show')) {
         navLinks.classList.remove('show');
     }
     
-    // Update Browser History (for mobile back button support)
     if (pushToHistory) {
         try {
             history.pushState({ viewId }, document.title, `#${viewId}`);
         } catch(e) {
-            // Ignore SecurityError on file:// protocol
             window.location.hash = viewId;
         }
     }
 }
 
-// Handle Browser Back/Forward buttons
 window.addEventListener('popstate', (e) => {
     if (e.state && e.state.viewId) {
-        navigateTo(e.state.viewId, false); // false = don't push history again
+        navigateTo(e.state.viewId, false);
     } else {
-        // Fallback for file:// protocol direct hash changes
         let hash = window.location.hash.substring(1);
         if (hash && document.getElementById(`view-${hash}`)) {
             navigateTo(hash, false);
@@ -57,24 +48,18 @@ window.addEventListener('popstate', (e) => {
     }
 });
 
-// Initialize on load
 window.addEventListener('DOMContentLoaded', () => {
-    // Check if URL has a hash initially
     let hash = window.location.hash.substring(1);
     if (!hash || !document.getElementById(`view-${hash}`)) {
         hash = 'home';
     }
     
-    // Replace initial state
     try {
         history.replaceState({ viewId: hash }, document.title, `#${hash}`);
-    } catch(e) {
-        // Ignore SecurityError on file:// protocol
-    }
+    } catch(e) {}
     navigateTo(hash, false);
 });
 
-// Mobile Menu Toggle
 document.getElementById('mobileMenuBtn').addEventListener('click', () => {
     document.getElementById('navLinks').classList.toggle('show');
 });
@@ -91,7 +76,6 @@ const pwdStrengthText = document.getElementById('pwdStrengthText');
 const pwdScore = document.getElementById('pwdScore');
 const pwdFeedback = document.getElementById('pwdFeedback');
 
-// Requirements Elements
 const reqLength = document.getElementById('req-length');
 const reqUpper = document.getElementById('req-upper');
 const reqLower = document.getElementById('req-lower');
@@ -117,41 +101,35 @@ function analyzePassword(password) {
 
     let score = 0;
     
-    // Checks
     const hasLength = password.length >= 8;
     const hasUpper = /[A-Z]/.test(password);
     const hasLower = /[a-z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
     const hasSpecial = /[^A-Za-z0-9]/.test(password);
 
-    // Update UI indicators
     updateReqItem(reqLength, hasLength);
     updateReqItem(reqUpper, hasUpper);
     updateReqItem(reqLower, hasLower);
     updateReqItem(reqNumber, hasNumber);
     updateReqItem(reqSpecial, hasSpecial);
 
-    // Calculate Score (Max ~100)
-    score += Math.min(password.length * 4, 40); // Up to 40 pts for length
+    score += Math.min(password.length * 4, 40);
     if (hasUpper) score += 15;
     if (hasLower) score += 15;
     if (hasNumber) score += 15;
     if (hasSpecial) score += 15;
 
-    // Bonus for combinations
     if (hasLength && hasUpper && hasLower && hasNumber && hasSpecial) {
         score += 10; 
     }
     
-    // Penalty for predictable patterns (simple mock check)
     const lowerPw = password.toLowerCase();
     if (lowerPw.includes('password') || lowerPw.includes('123456') || lowerPw.includes('qwerty')) {
         score -= 30;
     }
 
-    score = Math.max(0, Math.min(100, score)); // Clamp 0-100
+    score = Math.max(0, Math.min(100, score));
 
-    // Update UI
     pwdScore.textContent = `${score}/100`;
     pwdMeter.style.width = `${score}%`;
 
@@ -182,7 +160,6 @@ function analyzePassword(password) {
     pwdFeedback.textContent = feedback;
     pwdFeedback.style.borderLeftColor = color;
 
-    // Trigger server-side analysis
     fetchServerPasswordAnalysis(password);
 }
 
@@ -191,7 +168,6 @@ let pwdThrottleTimer;
 async function fetchServerPasswordAnalysis(password) {
     if (pwdThrottleTimer) clearTimeout(pwdThrottleTimer);
     
-    // Check if server insights element exists, otherwise create it
     let serverInsights = document.getElementById('pwdServerInsights');
     if (!serverInsights) {
         serverInsights = document.createElement('div');
@@ -209,7 +185,7 @@ async function fetchServerPasswordAnalysis(password) {
     
     pwdThrottleTimer = setTimeout(async () => {
         try {
-            const res = await fetch('https://web-production-c658.up.railway.app/api/check-password', {
+            const res = await fetch('https://web-production-7324.up.railway.app/api/check-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password })
@@ -265,7 +241,6 @@ function resetPasswordAnalyzer() {
 
 const hashInput = document.getElementById('hashInput');
 
-// SHA-256 logic
 const btnGenerateHash = document.getElementById('btnGenerateHash');
 const hashResultBox = document.getElementById('hashResultBox');
 const hashOutput = document.getElementById('hashOutput');
@@ -275,23 +250,19 @@ btnGenerateHash.addEventListener('click', async () => {
     const text = hashInput.value;
     if (!text) return;
 
-    // Convert string to array buffer
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
     
-    // Generate hash using Web Crypto API
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     
-    // Convert buffer to hex string
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     hashOutput.textContent = hashHex;
     hashResultBox.classList.remove('hidden');
     
-    // Add small glow effect to show generation
     hashResultBox.style.animation = 'none';
-    hashResultBox.offsetHeight; /* trigger reflow */
+    hashResultBox.offsetHeight;
     hashResultBox.style.animation = 'fadeIn 0.4s ease forwards';
 });
 
@@ -309,7 +280,6 @@ btnCopyHash.addEventListener('click', () => {
     });
 });
 
-// Caesar Cipher Logic
 const btnGenerateCipher = document.getElementById('btnGenerateCipher');
 const cipherShiftAmount = document.getElementById('cipherShiftAmount');
 const cipherResultBox = document.getElementById('cipherResultBox');
@@ -323,7 +293,6 @@ btnGenerateCipher.addEventListener('click', () => {
     let shift = parseInt(cipherShiftAmount.value, 10);
     if (isNaN(shift)) shift = 0;
     
-    // Normalize shift to positive 0-25 range
     shift = shift % 26;
     if (shift < 0) shift += 26;
     
@@ -332,17 +301,14 @@ btnGenerateCipher.addEventListener('click', () => {
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
         
-        // Uppercase
         if (char.match(/[A-Z]/)) {
             const code = text.charCodeAt(i);
             result += String.fromCharCode(((code - 65 + shift) % 26) + 65);
         }
-        // Lowercase
         else if (char.match(/[a-z]/)) {
             const code = text.charCodeAt(i);
             result += String.fromCharCode(((code - 97 + shift) % 26) + 97);
         }
-        // Non-alphabetic (keep as is)
         else {
             result += char;
         }
@@ -388,7 +354,6 @@ btnDecodeCipher.addEventListener('click', () => {
     let shift = parseInt(decodeShiftAmount.value, 10);
     if (isNaN(shift)) shift = 0;
     
-    // Reverse shift
     shift = -(shift % 26);
     if (shift < 0) shift += 26;
     
@@ -397,17 +362,14 @@ btnDecodeCipher.addEventListener('click', () => {
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
         
-        // Uppercase
         if (char.match(/[A-Z]/)) {
             const code = text.charCodeAt(i);
             result += String.fromCharCode(((code - 65 + shift) % 26) + 65);
         }
-        // Lowercase
         else if (char.match(/[a-z]/)) {
             const code = text.charCodeAt(i);
             result += String.fromCharCode(((code - 97 + shift) % 26) + 97);
         }
-        // Non-alphabetic (keep as is)
         else {
             result += char;
         }
@@ -450,7 +412,6 @@ btnAnalyzeUrl.addEventListener('click', async () => {
     const urlString = urlInput.value.trim();
     if (!urlString) return;
 
-    // Loading State
     const originalBtnHTML = btnAnalyzeUrl.innerHTML;
     btnAnalyzeUrl.innerHTML = '<i data-lucide="loader" class="spin"></i> Analyzing...';
     btnAnalyzeUrl.disabled = true;
@@ -458,7 +419,6 @@ btnAnalyzeUrl.addEventListener('click', async () => {
 
     let url;
     try {
-        // Automatically prepend http:// if missing so URL parser works
         url = new URL(urlString.startsWith('http') ? urlString : `http://${urlString}`);
     } catch (e) {
         showUrlResult('High Risk', 'danger', [{
@@ -476,27 +436,23 @@ btnAnalyzeUrl.addEventListener('click', async () => {
     let riskClass = 'safe';
     let riskScore = 0;
 
-    // 1. IP Address check
     const ipRegex = /\b(?:\d{1,3}\.){3}\d{1,3}\b/;
     if (ipRegex.test(url.hostname)) {
         findings.push({ icon: 'alert-circle', text: 'Uses an IP address instead of a domain name to obscure the destination.' });
         riskScore += 50;
     }
 
-    // 2. Length check
     if (urlString.length > 75) {
         findings.push({ icon: 'eye-off', text: `Suspiciously long URL (${urlString.length} chars). Often used to hide the true domain out of view.` });
         riskScore += 20;
     }
 
-    // 3. Subdomain check
     const domainParts = url.hostname.split('.');
     if (domainParts.length > 4 && !ipRegex.test(url.hostname)) {
         findings.push({ icon: 'layers', text: 'Excessive subdomains detected. Could be an attempt to fake a reputable domain (e.g., login.target.com.badguy.net).' });
         riskScore += 30;
     }
 
-    // 4. Suspicious keywords in hostname or path
     const susKeywords = ['login', 'verify', 'update', 'secure', 'account', 'banking', 'wallet', 'auth', 'confirm'];
     const foundKeywords = susKeywords.filter(kw => url.hostname.includes(kw) || url.pathname.includes(kw));
     
@@ -505,15 +461,13 @@ btnAnalyzeUrl.addEventListener('click', async () => {
         riskScore += 25;
     }
 
-    // 5. AT symbol
     if (url.username || url.password || urlString.includes('@')) {
         findings.push({ icon: 'at-sign', text: 'URL contains "@" symbol. Browsers typically ignore everything before the "@", redirecting to the actual host afterward.' });
         riskScore += 40;
     }
 
-    // 3. Server API Call (VirusTotal)
     try {
-        const res = await fetch('https://web-production-c658.up.railway.app/api/check-url', {
+        const res = await fetch('https://web-production-7324.up.railway.app/api/check-url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url: urlString })
@@ -522,13 +476,12 @@ btnAnalyzeUrl.addEventListener('click', async () => {
         if (res.ok) {
             const data = await res.json();
             
-            // Format VT data
             if (data.malicious > 0 || data.suspicious > 0) {
                 findings.unshift({ 
                     icon: 'shield-alert', 
                     text: `<strong>VirusTotal Detection:</strong> Flagged by ${data.malicious} engine(s) as malicious and ${data.suspicious} as suspicious.` 
                 });
-                riskScore += (data.malicious * 50) + (data.suspicious * 20); // Spike score based on VT
+                riskScore += (data.malicious * 50) + (data.suspicious * 20);
             } else if (data.harmless > 0) {
                 findings.push({ 
                     icon: 'shield-check', 
@@ -544,7 +497,6 @@ btnAnalyzeUrl.addEventListener('click', async () => {
         findings.push({ icon: 'wifi-off', text: 'Backend API unreachable. Falling back to local static analysis only.' });
     }
 
-    // Determine overall risk
     if (riskScore === 0) {
         findings.push({ icon: 'shield-check', text: 'No static or external phishing indicators detected.' });
     } else if (riskScore < 50) {
@@ -557,18 +509,14 @@ btnAnalyzeUrl.addEventListener('click', async () => {
 
     showUrlResult(riskLevel, riskClass, findings);
     
-    // Restore button
     btnAnalyzeUrl.innerHTML = originalBtnHTML;
     btnAnalyzeUrl.disabled = false;
     lucide.createIcons();
 });
 
-    // Old code was orphaned down here; removed.
-
 function showUrlResult(level, className, findings) {
     urlResultBox.classList.remove('hidden');
     
-    // Set Badge
     urlRiskBadge.className = `risk-indicator ${className}`;
     const iconObj = {
         'safe': 'shield-check',
@@ -577,7 +525,6 @@ function showUrlResult(level, className, findings) {
     };
     urlRiskBadge.innerHTML = `<i data-lucide="${iconObj[className]}"></i> Result: ${level}`;
     
-    // Set Findings
     urlFindings.innerHTML = '';
     findings.forEach(f => {
         const li = document.createElement('li');
@@ -604,7 +551,6 @@ const fDate = document.getElementById('fileMetaDate');
 const fileRiskBadge = document.getElementById('fileRiskBadge');
 const fileFindings = document.getElementById('fileFindings');
 
-// Drag and drop events
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     fileDropZone.addEventListener(eventName, preventDefaults, false);
 });
@@ -633,13 +579,11 @@ function handleFileSelect(e) {
 }
 
 async function analyzeFile(file) {
-    // Show Loading state on UI
     fName.textContent = file.name;
     fSize.textContent = formatBytes(file.size);
     fType.textContent = file.type || 'Unknown / Binary';
     fDate.textContent = file.lastModifiedDate ? file.lastModifiedDate.toLocaleString() : new Date(file.lastModified).toLocaleString();
 
-    // Reset Badge
     fileRiskBadge.className = `risk-indicator`;
     fileRiskBadge.innerHTML = `<i data-lucide="loader" class="spin"></i> Uploading to VirusTotal...`;
     fileFindings.innerHTML = '';
@@ -650,7 +594,6 @@ async function analyzeFile(file) {
     const findings = [];
     const fileName = file.name.toLowerCase();
     
-    // 1. Local Static Risk Assessment
     const highRiskExts = ['.exe', '.bat', '.cmd', '.msi', '.vbs', '.ps1', '.js', '.wsf', '.scr', '.pif'];
     if (highRiskExts.some(ext => fileName.endsWith(ext))) {
         findings.push({ icon: 'alert-triangle', text: `Contains a highly dangerous file extension. Executable files can run arbitrary code.` });
@@ -673,12 +616,11 @@ async function analyzeFile(file) {
         }
     }
     
-    // 2. Server API Scan
     try {
         const formData = new FormData();
         formData.append('file', file);
 
-        const res = await fetch('https://web-production-c658.up.railway.app/api/scan-file', {
+        const res = await fetch('https://web-production-7324.up.railway.app/api/scan-file', {
             method: 'POST',
             body: formData
         });
@@ -707,7 +649,6 @@ async function analyzeFile(file) {
         findings.push({ icon: 'wifi-off', text: 'Backend API unreachable. Analysis relies purely on local static checks.' });
     }
 
-    // Determine overall risk
     let riskLevel = 'Safe';
     let riskClass = 'safe';
 
@@ -727,7 +668,6 @@ async function analyzeFile(file) {
 }
 
 function showFileResult(level, className, findings) {
-    // Set Badge
     fileRiskBadge.className = `risk-indicator ${className}`;
     const iconObj = {
         'safe': 'shield-check',
@@ -736,7 +676,6 @@ function showFileResult(level, className, findings) {
     };
     fileRiskBadge.innerHTML = `<i data-lucide="${iconObj[className]}"></i> Result: ${level}`;
     
-    // Set Findings
     fileFindings.innerHTML = '';
     findings.forEach(f => {
         const li = document.createElement('li');
