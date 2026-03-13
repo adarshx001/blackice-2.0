@@ -887,7 +887,7 @@ textarea.cyber-input {
         gap: 1rem !important;
     }
     
-    .actions > div {
+    .actions > div:not(.input-wrapper) {
         display: none; /* Hide the vertical separator on mobile */
     }
     
