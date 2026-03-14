@@ -193,8 +193,10 @@ async function fetchServerPasswordAnalysis(password) {
             const data = await res.json();
             
             if (data.score !== undefined) {
-                let srvStrength = data.strength || (data.score > 2 ? 'Strong' : data.score === 2 ? 'Medium' : 'Weak');
-                serverInsights.innerHTML = `<strong>Server Analysis:</strong> zxcvbn Score: ${data.score}/4 (${srvStrength}). ${data.feedback ? data.feedback.warning || '' : ''}`;
+                let serverScore = data.score * 2;
+                let srvStrength = serverScore < 40 ? 'Weak' : serverScore < 75 ? 'Medium' : 'Strong';
+                let warning = data.feedback && data.feedback.warning ? `. ${data.feedback.warning}` : '';
+                serverInsights.innerHTML = `<strong>Server Analysis:</strong> Score ${serverScore}/100 — ${srvStrength}${warning}`;
             } else {
                 serverInsights.innerHTML = `<strong>Server Analysis:</strong> Strength metrics retrieved.`;
             }
