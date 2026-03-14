@@ -159,51 +159,6 @@ function analyzePassword(password) {
     
     pwdFeedback.textContent = feedback;
     pwdFeedback.style.borderLeftColor = color;
-
-    fetchServerPasswordAnalysis(password);
-}
-
-
-let pwdThrottleTimer;
-async function fetchServerPasswordAnalysis(password) {
-    if (pwdThrottleTimer) clearTimeout(pwdThrottleTimer);
-    
-    let serverInsights = document.getElementById('pwdServerInsights');
-    if (!serverInsights) {
-        serverInsights = document.createElement('div');
-        serverInsights.id = 'pwdServerInsights';
-        serverInsights.className = 'feedback-box mt-4';
-        serverInsights.style.borderLeftColor = 'var(--accent-blue)';
-        serverInsights.innerHTML = '<i data-lucide="loader" class="spin"></i> Consulting database...';
-        pwdFeedback.parentNode.insertBefore(serverInsights, pwdFeedback.nextSibling);
-        lucide.createIcons();
-    } else {
-        serverInsights.innerHTML = '<i data-lucide="loader" class="spin"></i> Consulting database...';
-        serverInsights.classList.remove('hidden');
-        lucide.createIcons();
-    }
-    
-    pwdThrottleTimer = setTimeout(async () => {
-        try {
-            const res = await fetch('https://web-production-7324.up.railway.app/api/check-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
-            });
-            const data = await res.json();
-            
-            if (data.score !== undefined) {
-                let serverScore = data.score * 2;
-                let srvStrength = serverScore < 40 ? 'Weak' : serverScore < 75 ? 'Medium' : 'Strong';
-                let warning = data.feedback && data.feedback.warning ? `. ${data.feedback.warning}` : '';
-                serverInsights.innerHTML = `<strong>Server Analysis:</strong> Score ${serverScore}/100 — ${srvStrength}${warning}`;
-            } else {
-                serverInsights.innerHTML = `<strong>Server Analysis:</strong> Strength metrics retrieved.`;
-            }
-        } catch (e) {
-            serverInsights.innerHTML = `<strong>Server Analysis:</strong> <span class="text-danger">Failed to connect to backend engine.</span>`;
-        }
-    }, 800);
 }
 
 function updateReqItem(el, isMet) {
@@ -229,9 +184,6 @@ function resetPasswordAnalyzer() {
     pwdStrengthText.style.color = 'var(--text-main)';
     pwdFeedback.textContent = 'Please enter a password to begin analysis.';
     pwdFeedback.style.borderLeftColor = 'var(--text-muted)';
-    
-    const serverInsights = document.getElementById('pwdServerInsights');
-    if (serverInsights) serverInsights.classList.add('hidden');
     
     [reqLength, reqUpper, reqLower, reqNumber, reqSpecial].forEach(el => updateReqItem(el, false));
 }
