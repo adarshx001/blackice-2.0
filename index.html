@@ -8,10 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Load Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <canvas id="matrixCanvas"></canvas>
     <div class="bg-elements">
         <div class="glow-orb primary"></div>
         <div class="glow-orb secondary"></div>
@@ -93,7 +93,6 @@
                 <p>Select a tool to begin local analysis.</p>
             </div>
             <div class="tools-grid">
-                <!-- Filled dynamically or repeating the grid from home -->
                 <div class="card glass dashboard-card">
                     <div class="card-header">
                         <div class="card-icon-wrapper">
@@ -216,7 +215,6 @@
                             <textarea id="hashInput" rows="3" placeholder="Enter text here to process..." class="cyber-input"></textarea>
                         </div>
                         
-                        <!-- Actions Row -->
                         <div class="actions" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
                             <button id="btnGenerateHash" class="btn btn-primary"><i data-lucide="cpu"></i> Generate SHA-256</button>
                             
@@ -229,7 +227,6 @@
                             <button id="btnGenerateCipher" class="btn btn-outline"><i data-lucide="lock"></i> Caesar Shift</button>
                         </div>
 
-                        <!-- Hash Result -->
                         <div class="result-box mt-4 hidden" id="hashResultBox">
                             <label>SHA-256 Output</label>
                             <div class="output-wrapper">
@@ -238,7 +235,6 @@
                             </div>
                         </div>
 
-                        <!-- Cipher Result -->
                         <div class="result-box mt-4 hidden" id="cipherResultBox">
                             <label>Caesar Cipher Output (Shifted)</label>
                             <div class="output-wrapper">
@@ -247,7 +243,6 @@
                             </div>
                         </div>
 
-                        <!-- Caesar Cipher Decoder -->
                         <div class="mt-4 pt-4 border-top">
                             <h3 class="mb-3" style="font-size: 1.1rem; font-weight: 500;">Caesar Cipher Decoder</h3>
                             
@@ -264,7 +259,6 @@
                                 <button id="btnDecodeCipher" class="btn btn-outline"><i data-lucide="unlock"></i> Decode</button>
                             </div>
 
-                            <!-- Decode Result -->
                             <div class="result-box mt-4 hidden" id="decodeResultBox">
                                 <label>Decoded Output</label>
                                 <div class="output-wrapper">
@@ -310,13 +304,8 @@
                         </div>
 
                         <div class="result-box mt-4 hidden" id="urlResultBox">
-                            <div class="risk-indicator" id="urlRiskBadge">
-                                <!-- Safe / Suspicious / High Risk -->
-                            </div>
-                            
-                            <ul class="finding-list" id="urlFindings">
-                                <!-- Findings injected here -->
-                            </ul>
+                            <div class="risk-indicator" id="urlRiskBadge"></div>
+                            <ul class="finding-list" id="urlFindings"></ul>
                         </div>
                     </div>
                 </div>
@@ -376,13 +365,8 @@
                             </div>
                             
                             <h3 class="mt-4 mb-2 border-bottom pb-1">Risk Assessment</h3>
-                            <div class="risk-indicator" id="fileRiskBadge">
-                                <!-- Safe / Suspicious / High Risk -->
-                            </div>
-                            
-                            <ul class="finding-list" id="fileFindings">
-                                <!-- Findings injected here -->
-                            </ul>
+                            <div class="risk-indicator" id="fileRiskBadge"></div>
+                            <ul class="finding-list" id="fileFindings"></ul>
                         </div>
                     </div>
                 </div>
@@ -406,7 +390,6 @@
 
     <script src="app.js"></script>
     <script>
-        // Initialize Lucide icons
         lucide.createIcons();
     </script>
 </body>
