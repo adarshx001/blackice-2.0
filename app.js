@@ -20,16 +20,16 @@ function navigateTo(viewId, pushToHistory = true) {
     targetLinks.forEach(link => {
         link.classList.add('active');
     });
-    
+
     const navLinks = document.getElementById('navLinks');
     if (navLinks.classList.contains('show')) {
         navLinks.classList.remove('show');
     }
-    
+
     if (pushToHistory) {
         try {
             history.pushState({ viewId }, document.title, `#${viewId}`);
-        } catch(e) {
+        } catch (e) {
             window.location.hash = viewId;
         }
     }
@@ -53,10 +53,10 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!hash || !document.getElementById(`view-${hash}`)) {
         hash = 'home';
     }
-    
+
     try {
         history.replaceState({ viewId: hash }, document.title, `#${hash}`);
-    } catch(e) {}
+    } catch (e) { }
     navigateTo(hash, false);
 });
 
@@ -100,7 +100,7 @@ function analyzePassword(password) {
     }
 
     let score = 0;
-    
+
     const hasLength = password.length >= 8;
     const hasUpper = /[A-Z]/.test(password);
     const hasLower = /[a-z]/.test(password);
@@ -120,9 +120,9 @@ function analyzePassword(password) {
     if (hasSpecial) score += 15;
 
     if (hasLength && hasUpper && hasLower && hasNumber && hasSpecial) {
-        score += 10; 
+        score += 10;
     }
-    
+
     const lowerPw = password.toLowerCase();
     if (lowerPw.includes('password') || lowerPw.includes('123456') || lowerPw.includes('qwerty')) {
         score -= 30;
@@ -156,7 +156,7 @@ function analyzePassword(password) {
     pwdStrengthText.textContent = strength;
     pwdStrengthText.style.color = color;
     pwdStrengthText.style.textShadow = `0 0 8px ${color}80`;
-    
+
     pwdFeedback.textContent = feedback;
     pwdFeedback.style.borderLeftColor = color;
 }
@@ -168,7 +168,7 @@ function updateReqItem(el, isMet) {
         newIcon.setAttribute('data-lucide', isMet ? 'check-circle-2' : 'circle');
         el.replaceChild(newIcon, currentIcon);
     }
-    
+
     if (isMet) {
         el.classList.add('met');
     } else {
@@ -184,7 +184,7 @@ function resetPasswordAnalyzer() {
     pwdStrengthText.style.color = 'var(--text-main)';
     pwdFeedback.textContent = 'Please enter a password to begin analysis.';
     pwdFeedback.style.borderLeftColor = 'var(--text-muted)';
-    
+
     [reqLength, reqUpper, reqLower, reqNumber, reqSpecial].forEach(el => updateReqItem(el, false));
 }
 
@@ -206,15 +206,15 @@ btnGenerateHash.addEventListener('click', async () => {
 
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
-    
+
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    
+
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     hashOutput.textContent = hashHex;
     hashResultBox.classList.remove('hidden');
-    
+
     hashResultBox.style.animation = 'none';
     hashResultBox.offsetHeight;
     hashResultBox.style.animation = 'fadeIn 0.4s ease forwards';
@@ -223,7 +223,7 @@ btnGenerateHash.addEventListener('click', async () => {
 btnCopyHash.addEventListener('click', () => {
     const hash = hashOutput.textContent;
     if (!hash) return;
-    
+
     navigator.clipboard.writeText(hash).then(() => {
         btnCopyHash.innerHTML = '<i data-lucide="check"></i>';
         lucide.createIcons();
@@ -246,15 +246,15 @@ btnGenerateCipher.addEventListener('click', () => {
 
     let shift = parseInt(cipherShiftAmount.value, 10);
     if (isNaN(shift)) shift = 0;
-    
+
     shift = shift % 26;
     if (shift < 0) shift += 26;
-    
+
     let result = '';
-    
+
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        
+
         if (char.match(/[A-Z]/)) {
             const code = text.charCodeAt(i);
             result += String.fromCharCode(((code - 65 + shift) % 26) + 65);
@@ -267,19 +267,19 @@ btnGenerateCipher.addEventListener('click', () => {
             result += char;
         }
     }
-    
+
     cipherOutput.textContent = result;
     cipherResultBox.classList.remove('hidden');
-    
+
     cipherResultBox.style.animation = 'none';
-    cipherResultBox.offsetHeight; 
+    cipherResultBox.offsetHeight;
     cipherResultBox.style.animation = 'fadeIn 0.4s ease forwards';
 });
 
 btnCopyCipher.addEventListener('click', () => {
     const cipherText = cipherOutput.textContent;
     if (!cipherText) return;
-    
+
     navigator.clipboard.writeText(cipherText).then(() => {
         btnCopyCipher.innerHTML = '<i data-lucide="check"></i>';
         lucide.createIcons();
@@ -307,15 +307,15 @@ btnDecodeCipher.addEventListener('click', () => {
 
     let shift = parseInt(decodeShiftAmount.value, 10);
     if (isNaN(shift)) shift = 0;
-    
+
     shift = -(shift % 26);
     if (shift < 0) shift += 26;
-    
+
     let result = '';
-    
+
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        
+
         if (char.match(/[A-Z]/)) {
             const code = text.charCodeAt(i);
             result += String.fromCharCode(((code - 65 + shift) % 26) + 65);
@@ -328,19 +328,19 @@ btnDecodeCipher.addEventListener('click', () => {
             result += char;
         }
     }
-    
+
     decodeOutput.textContent = result;
     decodeResultBox.classList.remove('hidden');
-    
+
     decodeResultBox.style.animation = 'none';
-    decodeResultBox.offsetHeight; 
+    decodeResultBox.offsetHeight;
     decodeResultBox.style.animation = 'fadeIn 0.4s ease forwards';
 });
 
 btnCopyDecode.addEventListener('click', () => {
     const decodedText = decodeOutput.textContent;
     if (!decodedText) return;
-    
+
     navigator.clipboard.writeText(decodedText).then(() => {
         btnCopyDecode.innerHTML = '<i data-lucide="check"></i>';
         lucide.createIcons();
@@ -409,7 +409,7 @@ btnAnalyzeUrl.addEventListener('click', async () => {
 
     const susKeywords = ['login', 'verify', 'update', 'secure', 'account', 'banking', 'wallet', 'auth', 'confirm'];
     const foundKeywords = susKeywords.filter(kw => url.hostname.includes(kw) || url.pathname.includes(kw));
-    
+
     if (foundKeywords.length > 0) {
         findings.push({ icon: 'alert-triangle', text: `Contains deceptive urgency/auth keywords: ${foundKeywords.join(', ')}.` });
         riskScore += 25;
@@ -426,28 +426,28 @@ btnAnalyzeUrl.addEventListener('click', async () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url: urlString })
         });
-        
+
         if (res.ok) {
             const data = await res.json();
-            
+
             if (data.malicious > 0 || data.suspicious > 0) {
-                findings.unshift({ 
-                    icon: 'shield-alert', 
-                    text: `<strong>VirusTotal Detection:</strong> Flagged by ${data.malicious} engine(s) as malicious and ${data.suspicious} as suspicious.` 
+                findings.unshift({
+                    icon: 'shield-alert',
+                    text: `<strong>VirusTotal Detection:</strong> Flagged by ${data.malicious} engine(s) as malicious and ${data.suspicious} as suspicious.`
                 });
                 riskScore += (data.malicious * 50) + (data.suspicious * 20);
             } else if (data.harmless > 0) {
-                findings.push({ 
-                    icon: 'shield-check', 
-                    text: `<strong>VirusTotal Analysis:</strong> ${data.harmless} security vendors classified this as harmless.` 
+                findings.push({
+                    icon: 'shield-check',
+                    text: `<strong>VirusTotal Analysis:</strong> ${data.harmless} security vendors classified this as harmless.`
                 });
             } else if (data.error) {
-                 findings.push({ icon: 'server-crash', text: `Server warning: ${data.error}` });
+                findings.push({ icon: 'server-crash', text: `Server warning: ${data.error}` });
             }
         } else {
             findings.push({ icon: 'server-crash', text: 'Failed to retrieve deep analysis from backend API.' });
         }
-    } catch(err) {
+    } catch (err) {
         findings.push({ icon: 'wifi-off', text: 'Backend API unreachable. Falling back to local static analysis only.' });
     }
 
@@ -462,7 +462,7 @@ btnAnalyzeUrl.addEventListener('click', async () => {
     }
 
     showUrlResult(riskLevel, riskClass, findings);
-    
+
     btnAnalyzeUrl.innerHTML = originalBtnHTML;
     btnAnalyzeUrl.disabled = false;
     lucide.createIcons();
@@ -470,7 +470,7 @@ btnAnalyzeUrl.addEventListener('click', async () => {
 
 function showUrlResult(level, className, findings) {
     urlResultBox.classList.remove('hidden');
-    
+
     urlRiskBadge.className = `risk-indicator ${className}`;
     const iconObj = {
         'safe': 'shield-check',
@@ -478,7 +478,7 @@ function showUrlResult(level, className, findings) {
         'danger': 'shield-alert'
     };
     urlRiskBadge.innerHTML = `<i data-lucide="${iconObj[className]}"></i> Result: ${level}`;
-    
+
     urlFindings.innerHTML = '';
     findings.forEach(f => {
         const li = document.createElement('li');
@@ -547,7 +547,7 @@ async function analyzeFile(file) {
     let riskScore = 0;
     const findings = [];
     const fileName = file.name.toLowerCase();
-    
+
     const highRiskExts = ['.exe', '.bat', '.cmd', '.msi', '.vbs', '.ps1', '.js', '.wsf', '.scr', '.pif'];
     if (highRiskExts.some(ext => fileName.endsWith(ext))) {
         findings.push({ icon: 'alert-triangle', text: `Contains a highly dangerous file extension. Executable files can run arbitrary code.` });
@@ -559,17 +559,17 @@ async function analyzeFile(file) {
         findings.push({ icon: 'alert-circle', text: `This is a macro-enabled Office document. Macros are frequently used by attackers.` });
         riskScore += 60;
     }
-    
+
     const nameParts = fileName.split('.');
     if (nameParts.length > 2) {
         const combo = `${nameParts[nameParts.length - 2]}.${nameParts[nameParts.length - 1]}`;
         const safeDoubles = ['tar.gz', 'min.js', 'min.css', 'd.ts'];
         if (!safeDoubles.includes(combo)) {
-            findings.push({ icon: 'eye-off', text: `Double extension detected (.${combo}). Attackers use this to trick Windows users.`});
+            findings.push({ icon: 'eye-off', text: `Double extension detected (.${combo}). Attackers use this to trick Windows users.` });
             riskScore += 50;
         }
     }
-    
+
     try {
         const formData = new FormData();
         formData.append('file', file);
@@ -588,7 +588,7 @@ async function analyzeFile(file) {
                 });
                 riskScore += (data.malicious * 50);
             } else if (data.harmless > 0 || data.undetected > 0) {
-                 findings.push({
+                findings.push({
                     icon: 'shield-check',
                     text: `<strong>VirusTotal Deep Scan:</strong> Clean. ${data.harmless + data.undetected} engines detected no threats.`
                 });
@@ -596,10 +596,10 @@ async function analyzeFile(file) {
                 findings.push({ icon: 'server-crash', text: `Server analysis warning: ${data.error}` });
             }
         } else {
-             findings.push({ icon: 'server-crash', text: 'Failed to retrieve deep analysis from backend API.' });
+            findings.push({ icon: 'server-crash', text: 'Failed to retrieve deep analysis from backend API.' });
         }
 
-    } catch(err) {
+    } catch (err) {
         findings.push({ icon: 'wifi-off', text: 'Backend API unreachable. Analysis relies purely on local static checks.' });
     }
 
@@ -629,7 +629,7 @@ function showFileResult(level, className, findings) {
         'danger': 'shield-alert'
     };
     fileRiskBadge.innerHTML = `<i data-lucide="${iconObj[className]}"></i> Result: ${level}`;
-    
+
     fileFindings.innerHTML = '';
     findings.forEach(f => {
         const li = document.createElement('li');
@@ -648,3 +648,121 @@ function formatBytes(bytes, decimals = 2) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
+
+// ==========================================
+// Chatbot Logic
+// ==========================================
+
+const chatbotToggleBtn = document.getElementById('chatbot-toggle-btn');
+const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
+const chatbotContainer = document.getElementById('chatbot-container');
+const chatbotInput = document.getElementById('chatbot-input');
+const chatbotSendBtn = document.getElementById('chatbot-send-btn');
+const chatbotMessages = document.getElementById('chatbot-messages');
+
+const GEMINI_API_KEY = 'AIzaSyDCn_kAo6wUxzPvAdc-Dxf9aRd76yhG6vs';
+const SYSTEM_PROMPT = `You are BlackICE Assistant, a cybersecurity chatbot built into the BlackICE toolkit. You have two areas of expertise:
+1. About BlackICE project:
+BlackICE is a free web-based cybersecurity toolkit built by students Adarsh S, Prachi N and Swanandi N. It has 5 tools:
+Password Analyzer: checks password strength in real time, scores it, estimates crack time. Runs entirely in JavaScript — password never leaves the device.
+SHA-256 Hash Generator: converts any text into a cryptographic hash using the browser's built-in Web Crypto API. One way — cannot be reversed.
+Caesar Cipher: encrypts and decrypts text using a shift value. Both encoder and decoder are available.
+Phishing URL Checker: analyzes URLs using heuristic pattern checks and VirusTotal deep scan across 70+ antivirus engines.
+File Analyzer: reads file metadata, hex preview, calculates SHA-256 hash, and runs a VirusTotal malware scan. Files never leave the device.
+The frontend is hosted on GitHub Pages. The backend is Python Flask hosted on Railway. VirusTotal API key is secured in Railway environment variables. Live at: adarshx001.github.io/blackice-2.0
+
+2. About cybersecurity in general:
+Answer any cybersecurity question clearly and simply — hashing, encryption, phishing, malware, firewalls, VPNs, SQL injection, XSS, network security, ethical hacking, or anything else related to cybersecurity.
+Keep all answers simple, clear and educational. If asked something completely unrelated to cybersecurity or BlackICE, politely say you can only help with cybersecurity topics.`;
+
+// We use the conversational history format internally,
+// but formatting requests to API per user requirements.
+let chatHistory = [];
+
+function toggleChatbot() {
+    chatbotContainer.classList.toggle('chatbot-hidden');
+    if (!chatbotContainer.classList.contains('chatbot-hidden')) {
+        setTimeout(() => chatbotInput.focus(), 100);
+    }
+}
+
+chatbotToggleBtn.addEventListener('click', toggleChatbot);
+chatbotCloseBtn.addEventListener('click', toggleChatbot);
+
+function addChatMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('chat-message');
+    msgDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+    
+    // Parse basic markdown: bolding
+    let formattedText = text.replace(/\\n/g, '<br>');
+    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    msgDiv.innerHTML = formattedText;
+    
+    chatbotMessages.appendChild(msgDiv);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+function showTypingIndicator() {
+    const indicator = document.createElement('div');
+    indicator.classList.add('typing-indicator');
+    indicator.id = 'typing-indicator';
+    indicator.innerHTML = '<span></span><span></span><span></span>';
+    chatbotMessages.appendChild(indicator);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+function removeTypingIndicator() {
+    const indicator = document.getElementById('typing-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+async function sendChatMessage() {
+    const text = chatbotInput.value.trim();
+    if (!text) return;
+    
+    chatbotInput.value = '';
+    addChatMessage(text, 'user');
+    showTypingIndicator();
+    
+    // Add history for context matching Gemini's multi-turn structure
+    chatHistory.push({ role: 'user', parts: [{ text: text }] });
+    
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: chatHistory,
+                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
+            })
+        });
+        
+        const data = await response.json();
+        removeTypingIndicator();
+        
+        if (data.candidates && data.candidates.length > 0) {
+            const aiText = data.candidates[0].content.parts[0].text;
+            addChatMessage(aiText, 'ai');
+            chatHistory.push({ role: 'model', parts: [{ text: aiText }] });
+        } else {
+            addChatMessage("I'm sorry, I couldn't generate a response. Please try again.", 'ai');
+            if (data.error) console.error('Gemini API Error:', data.error);
+        }
+    } catch (err) {
+        removeTypingIndicator();
+        addChatMessage("Sorry, I'm having trouble connecting right now. Please try again later.", 'ai');
+        console.error('Chatbot error:', err);
+    }
+}
+
+chatbotSendBtn.addEventListener('click', sendChatMessage);
+chatbotInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendChatMessage();
+    }
+});
