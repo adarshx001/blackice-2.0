@@ -660,20 +660,8 @@ const chatbotInput = document.getElementById('chatbot-input');
 const chatbotSendBtn = document.getElementById('chatbot-send-btn');
 const chatbotMessages = document.getElementById('chatbot-messages');
 
-const GEMINI_API_KEY = 'AIzaSyB6869ARrxPAQ1zi5jr6N3KeKiw--fFDaE';
-const SYSTEM_PROMPT = `You are BlackICE Assistant, a cybersecurity chatbot built into the BlackICE toolkit. You have two areas of expertise:
-1. About BlackICE project:
-BlackICE is a free web-based cybersecurity toolkit built by students Adarsh S, Prachi N and Swanandi N. It has 5 tools:
-Password Analyzer: checks password strength in real time, scores it, estimates crack time. Runs entirely in JavaScript — password never leaves the device.
-SHA-256 Hash Generator: converts any text into a cryptographic hash using the browser's built-in Web Crypto API. One way — cannot be reversed.
-Caesar Cipher: encrypts and decrypts text using a shift value. Both encoder and decoder are available.
-Phishing URL Checker: analyzes URLs using heuristic pattern checks and VirusTotal deep scan across 70+ antivirus engines.
-File Analyzer: reads file metadata, hex preview, calculates SHA-256 hash, and runs a VirusTotal malware scan. Files never leave the device.
-The frontend is hosted on GitHub Pages. The backend is Python Flask hosted on Railway. VirusTotal API key is secured in Railway environment variables. Live at: adarshx001.github.io/blackice-2.0
-
-2. About cybersecurity in general:
-Answer any cybersecurity question clearly and simply — hashing, encryption, phishing, malware, firewalls, VPNs, SQL injection, XSS, network security, ethical hacking, or anything else related to cybersecurity.
-Keep all answers simple, clear and educational. If asked something completely unrelated to cybersecurity or BlackICE, politely say you can only help with cybersecurity topics.`;
+// Security fix: Gemini API key and System Prompt were removed from frontend.
+// They MUST be moved to your Python Railway backend to prevent them from being leaked on GitHub!
 
 let chatHistory = [];
 
@@ -730,28 +718,25 @@ async function sendChatMessage() {
     showTypingIndicator();
     
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        // Calling your Python Railway Backend instead of Google API directly!
+        const response = await fetch('https://web-production-7324.up.railway.app/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: text }] }],
-                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
-            })
+            body: JSON.stringify({ message: text }) // We send the user's message to your own backend
         });
         
         const data = await response.json();
         removeTypingIndicator();
         
-        if (data.candidates && data.candidates.length > 0) {
-            const aiText = data.candidates[0].content.parts[0].text;
-            addChatMessage(aiText, 'ai');
+        if (response.ok && data.reply) {
+            addChatMessage(data.reply, 'ai');
         } else {
             addChatMessage("I'm sorry, I couldn't generate a response.", 'ai');
-            if (data.error) console.error('Gemini API Error:', data.error);
+            if (data.error) console.error('Backend API Error:', data.error);
         }
     } catch (err) {
         removeTypingIndicator();
-        addChatMessage("Connection error. Please try again later.", 'ai');
+        addChatMessage("Connection error with backend. Please try again later.", 'ai');
         console.error('Chatbot error:', err);
     }
 }
