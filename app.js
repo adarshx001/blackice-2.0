@@ -729,15 +729,12 @@ async function sendChatMessage() {
     addChatMessage(text, 'user');
     showTypingIndicator();
     
-    // Match Gemini's conversational history format
-    chatHistory.push({ role: 'user', parts: [{ text: text }] });
-    
     try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: chatHistory,
+                contents: [{ parts: [{ text: text }] }],
                 systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
             })
         });
@@ -748,13 +745,14 @@ async function sendChatMessage() {
         if (data.candidates && data.candidates.length > 0) {
             const aiText = data.candidates[0].content.parts[0].text;
             addChatMessage(aiText, 'ai');
-            chatHistory.push({ role: 'model', parts: [{ text: aiText }] });
         } else {
             addChatMessage("I'm sorry, I couldn't generate a response.", 'ai');
+            if (data.error) console.error('Gemini API Error:', data.error);
         }
     } catch (err) {
         removeTypingIndicator();
         addChatMessage("Connection error. Please try again later.", 'ai');
+        console.error('Chatbot error:', err);
     }
 }
 
