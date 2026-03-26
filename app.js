@@ -650,7 +650,7 @@ function formatBytes(bytes, decimals = 2) {
 }
 
 // ==========================================
-// Chatbot Logic
+// Chatbot Logic Complete Rebuild
 // ==========================================
 
 const chatbotToggleBtn = document.getElementById('chatbot-toggle-btn');
@@ -675,8 +675,6 @@ The frontend is hosted on GitHub Pages. The backend is Python Flask hosted on Ra
 Answer any cybersecurity question clearly and simply — hashing, encryption, phishing, malware, firewalls, VPNs, SQL injection, XSS, network security, ethical hacking, or anything else related to cybersecurity.
 Keep all answers simple, clear and educational. If asked something completely unrelated to cybersecurity or BlackICE, politely say you can only help with cybersecurity topics.`;
 
-// We use the conversational history format internally,
-// but formatting requests to API per user requirements.
 let chatHistory = [];
 
 function toggleChatbot() {
@@ -702,6 +700,7 @@ function addChatMessage(text, sender) {
     msgDiv.innerHTML = formattedText;
     
     chatbotMessages.appendChild(msgDiv);
+    // Auto scroll to latest message
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 }
 
@@ -711,6 +710,7 @@ function showTypingIndicator() {
     indicator.id = 'typing-indicator';
     indicator.innerHTML = '<span></span><span></span><span></span>';
     chatbotMessages.appendChild(indicator);
+    // Auto scroll to latest message
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 }
 
@@ -729,7 +729,7 @@ async function sendChatMessage() {
     addChatMessage(text, 'user');
     showTypingIndicator();
     
-    // Add history for context matching Gemini's multi-turn structure
+    // Match Gemini's conversational history format
     chatHistory.push({ role: 'user', parts: [{ text: text }] });
     
     try {
@@ -750,13 +750,11 @@ async function sendChatMessage() {
             addChatMessage(aiText, 'ai');
             chatHistory.push({ role: 'model', parts: [{ text: aiText }] });
         } else {
-            addChatMessage("I'm sorry, I couldn't generate a response. Please try again.", 'ai');
-            if (data.error) console.error('Gemini API Error:', data.error);
+            addChatMessage("I'm sorry, I couldn't generate a response.", 'ai');
         }
     } catch (err) {
         removeTypingIndicator();
-        addChatMessage("Sorry, I'm having trouble connecting right now. Please try again later.", 'ai');
-        console.error('Chatbot error:', err);
+        addChatMessage("Connection error. Please try again later.", 'ai');
     }
 }
 
