@@ -660,7 +660,7 @@ const chatbotInput = document.getElementById('chatbot-input');
 const chatbotSendBtn = document.getElementById('chatbot-send-btn');
 const chatbotMessages = document.getElementById('chatbot-messages');
 
-const GEMINI_API_KEY = 'AIzaSyDCn_kAo6wUxzPvAdc-Dxf9aRd76yhG6vs';
+const GEMINI_API_KEY = 'AIzaSyB6869ARrxPAQ1zi5jr6N3KeKiw--fFDaE';
 const SYSTEM_PROMPT = `You are BlackICE Assistant, a cybersecurity chatbot built into the BlackICE toolkit. You have two areas of expertise:
 1. About BlackICE project:
 BlackICE is a free web-based cybersecurity toolkit built by students Adarsh S, Prachi N and Swanandi N. It has 5 tools:
@@ -730,7 +730,7 @@ async function sendChatMessage() {
     showTypingIndicator();
     
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

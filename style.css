@@ -977,6 +977,7 @@ textarea.cyber-input {
     font-size: 1rem;
     font-weight: 700;
     color: #ffffff;
+    flex-grow: 1;
 }
 
 .chatbot-header .icon-btn {
